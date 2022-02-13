@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Nodes;
+using TechnicalTestApi.Data.Models;
 using TechnicalTestApi.Models;
-using TechnicalTestApi.Repositories;
+using TechnicalTestApi.Services;
 
 namespace TechnicalTestApi.Controllers
 {
@@ -9,23 +10,40 @@ namespace TechnicalTestApi.Controllers
     [ApiController]
     public class RegistrationController : ControllerBase
     {
-        public IRegistrationRepository _registrationRepository;
-        public RegistrationController(IRegistrationRepository registrationRepository)
+        public RegistrationsService _registrationService;
+        public RegistrationController(RegistrationsService registrationService)
         {
-            _registrationRepository = registrationRepository;
+            _registrationService = registrationService;
         }
-        
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Registration>> GetRegistrations(string id)
+        public async Task<ActionResult<Registration>> GetRegistration(string id)
         {
-            return await _registrationRepository.Get(id);
+            var registration = await _registrationService.Get(id);
+            if (registration == null)
+            {
+                return NotFound();
+            }
+            return registration;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Registration>> PostRegistrations([FromBody]Registration registration)
+        public async Task<ActionResult<Registration>> PostRegistrations([FromBody] ResponseRegistration registration)
         {
-            var newRegistration = await _registrationRepository.Create(registration);
-            return CreatedAtAction(nameof(GetRegistrations), new { id = newRegistration.Id }, newRegistration.Id);
+            if (ModelState.IsValid)
+            {
+                var newRegistration = await _registrationService.Create(registration);
+                return CreatedAtAction(nameof(GetRegistration), new { id = newRegistration.Id },
+                    new JsonObject
+                    {
+                        ["registrationId"] = newRegistration.Id
+                    });
+            } 
+            else
+            {
+                return BadRequest();
+            }
+            
         }
     }
 }
