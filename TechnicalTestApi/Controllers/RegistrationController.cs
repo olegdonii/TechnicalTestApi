@@ -17,10 +17,10 @@ namespace TechnicalTestApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Registration>> GetRegistration(string id)
+        public async Task<ActionResult<Registration>> GetRegistration(Guid id)
         {
-            var registration = await _registrationService.Get(id);
-            if (registration == null)
+            var registration = await _registrationService.GetById(id);
+            if (registration is null)
             {
                 return NotFound();
             }

@@ -17,7 +17,7 @@ namespace TechnicalTestApi.Services
         {
             var _registration = new Registration()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 Locale = registration.Locale,
                 RegistrationDate = DateTime.Now,
                 Organisation = new Organisation()
@@ -63,7 +63,7 @@ namespace TechnicalTestApi.Services
             return _registration;
         }
 
-        public async Task<Registration> Get(string id)
+        public async Task<Registration?> GetById(Guid id)
         {
             var registration = await _context.Registrations.FindAsync(id);
             if(registration == null)

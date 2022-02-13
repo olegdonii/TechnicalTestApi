@@ -5,7 +5,7 @@ namespace TechnicalTestApi.Repositories
 {
     public interface IRegistrationRepository
     {
-        Task<Registration> Get(string id);
+        Task<Registration?> GetById(Guid id);
         Task<Registration> Create(ResponseRegistration registration);
     }
 }
